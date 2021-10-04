@@ -1,0 +1,13 @@
+version: '3'
+services:
+  postgres_js:
+    container_name: 'jobs_and_services'
+    restart: 'always'
+    image: js_postgres:13.4
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_PASSWORD=password=3GM^?Zb+D^*kpZ@
+    volumes:
+      - /data/js_postgres/postgres/data:/var/lib/postgresql/data
+
