@@ -18,11 +18,11 @@ import java.util.function.Function;
 @Service
 public class JwtUtils {
 
-    @Value("${co.module.secret_key}")
+    @Value("${js.module.secret_key}")
     private String SECRET_KEY;
 
-    public static Long EXPIRES_IN_MILLIS = 300_000L;
-    public static Long REFRESH_EXPIRES_IN_MILLIS = 60000*60*12L;
+    public static Long EXPIRES_IN_MILLIS = 90_000L;
+    public static Long REFRESH_EXPIRES_IN_MILLIS = 300_000L;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

@@ -63,12 +63,19 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 		return authProvider;
 	}
 
+//	TODO : postman-ით გატესტე უსაფრთხოება!!!
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable()
 				.cors().and()
 				.authorizeRequests()
-				.antMatchers("/ping", "/authenticate", "/jwt_via_refresh_token", "/generate_temp_code_for_login", "/generate_temp_code_for_register", "/register").permitAll()
+				.antMatchers("/ping",
+						"/authenticate",
+						"/jwt_via_refrebuttonsh_token",
+						"/generate_temp_code_for_login",
+						"/generate_temp_code_for_register",
+						"/register"
+				).permitAll()
 				.anyRequest().authenticated()
 				.and().exceptionHandling()
 				.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
