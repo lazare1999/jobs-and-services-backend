@@ -12,12 +12,19 @@ import lombok.Setter;
 public class RegisterModel {
 
     private String phoneNumber;
+    private String countryPhoneCode;
     private String firstName;
     private String lastName;
-    private String pn;
     private String email;
     private String nickname;
     private String password;
     private String code;
+    private String address;
+    private String personalNumber;
+    private String passportNumber;
+
+    public String getFullPhone() {
+        return this.countryPhoneCode + this.phoneNumber;
+    }
 
 }

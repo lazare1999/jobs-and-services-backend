@@ -16,9 +16,9 @@ public interface MainService {
 
     ResponseEntity<Boolean> logout(String token);
 
-    void generateTemporaryCodeForLogin(String username);
+    void generateTemporaryCodeForLogin(String username, String countryCode);
 
-    void generateTemporaryCodeForRegister(String username);
+    void generateTemporaryCodeForRegister(String username, String countryCode);
 
     ResponseEntity<?> createAuthenticationToken(AuthenticationRequest autRequest) throws Exception;
 

@@ -53,8 +53,8 @@ public class MyUserDetailsService implements UserDetailsService {
     }
 
     public void register(RegisterModel m, String SALT) {
-        String sql = "INSERT INTO users.users(phone_number, first_name, last_name, email, nickname, password) VALUES (?, ?, ?, ?, ?, ?);";
-        getJdbcTemplate().update(sql, m.getPhoneNumber(), m.getFirstName(), m.getLastName(), m.getEmail(), m.getNickname(), encrypt(SALT, m.getPassword()));
+        String sql = "INSERT INTO users.users(phone_number, first_name, last_name, email, nickname, password, personal_number, passport_number, address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        getJdbcTemplate().update(sql, m.getFullPhone(), m.getFirstName(), m.getLastName(), m.getEmail(), m.getNickname(), encrypt(SALT, m.getPassword()), m.getPersonalNumber(), m.getPassportNumber(), m.getAddress());
     }
 
     private List<GrantedAuthority> loadUserAuthorities(String username) {

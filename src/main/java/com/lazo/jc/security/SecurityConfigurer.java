@@ -69,9 +69,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 		httpSecurity.csrf().disable()
 				.cors().and()
 				.authorizeRequests()
-				.antMatchers("/ping",
-						"/authenticate",
-						"/jwt_via_refrebuttonsh_token",
+				.antMatchers("/authenticate",
+						"/jwt_via_refresh_token",
 						"/generate_temp_code_for_login",
 						"/generate_temp_code_for_register",
 						"/register"

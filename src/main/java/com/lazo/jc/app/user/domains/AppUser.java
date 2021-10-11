@@ -46,4 +46,13 @@ public class AppUser {
     @Column(name = "rating")
     private Double rating;
 
+    @Column(name = "personal_number")
+    private String personalNumber;
+
+    @Column(name = "passport_number")
+    private String passportNumber;
+
+    @Column(name = "address")
+    private String address;
+
 }

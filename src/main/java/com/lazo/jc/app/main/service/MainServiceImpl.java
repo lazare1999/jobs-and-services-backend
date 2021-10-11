@@ -138,37 +138,41 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public void generateTemporaryCodeForLogin(String username) {
+    public void generateTemporaryCodeForLogin(String username, String countryCode) {
 
-        if (StringUtils.isEmpty(username))
+        if (StringUtils.isEmpty(countryCode) || StringUtils.isEmpty(username))
             return;
+
+        var fullUsrName = countryCode + username;
 
 //        String code = RandomStringUtils.random(6, false, true);
         String code = "123";
 
 //        if (smsOffice(username, code)) {
-            var userId = userRepository.findUserIdByUsername(username);
+            var userId = userRepository.findUserIdByUsername(fullUsrName);
             if (userId ==null || Objects.equals(userId, 0L)) {
                 return;
             }
-            var td = temporaryCodesRepository.findByUserName(username);
+            var td = temporaryCodesRepository.findByUserName(fullUsrName);
             td.ifPresent(temporaryCodesDomain -> temporaryCodesRepository.deleteById(temporaryCodesDomain.getTemporaryCodeId()));
-            temporaryCodesRepository.save(new TemporaryCodesDomain(username, encrypt(SALT, code)));
+            temporaryCodesRepository.save(new TemporaryCodesDomain(fullUsrName, encrypt(SALT, code)));
 //        }
     }
 
     @Override
-    public void generateTemporaryCodeForRegister(String username) {
+    public void generateTemporaryCodeForRegister(String username, String countryCode) {
 
-        if (StringUtils.isEmpty(username))
+        if (StringUtils.isEmpty(countryCode) || StringUtils.isEmpty(username))
             return;
+
+        var fullUsrName = countryCode + username;
 
 //        String code = RandomStringUtils.random(6, false, true);
         String code = "123";
 
 //        if (smsOffice(username, code)) {
-            forRegisterUserInfo.remove(username);
-            forRegisterUserInfo.put(username, encrypt(SALT, code));
+            forRegisterUserInfo.remove(fullUsrName);
+            forRegisterUserInfo.put(fullUsrName, encrypt(SALT, code));
 //        }
     }
 
@@ -236,7 +240,7 @@ public class MainServiceImpl implements MainService {
         if (StringUtils.isEmpty(model.getCode()))
             return new ResponseEntity<>("temporary_code_empty", headers, HttpStatus.BAD_REQUEST);
 
-        var username = model.getPhoneNumber();
+        var username = model.getCountryPhoneCode() + model.getPhoneNumber();
 
         if (StringUtils.isEmpty(username))
             return new ResponseEntity<>("phone_number_empty", headers, HttpStatus.BAD_REQUEST);
