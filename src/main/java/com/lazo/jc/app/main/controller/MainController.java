@@ -80,4 +80,4 @@ public class MainController {
 }
 
 
-//TODO : ინდექსები დაადე ბაზას
+
