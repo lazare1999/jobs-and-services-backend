@@ -1,5 +1,6 @@
 package com.lazo.jc.app.main.service;
 
+import com.lazo.jc.app.email.MailService;
 import com.lazo.jc.app.main.models.AuthenticationRequest;
 import com.lazo.jc.app.main.models.AuthenticationResponse;
 import com.lazo.jc.app.main.models.RegisterModel;
@@ -12,6 +13,7 @@ import com.lazo.jc.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import net.jodah.expiringmap.ExpiringMap;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,6 +43,8 @@ public class MainServiceImpl implements MainService {
 
     public static Map<String, String> forRegisterUserInfo = ExpiringMap.builder().expiration(5, TimeUnit.MINUTES).build();
 
+    public static Map<Long, String> resetPasswordsTempCodes = ExpiringMap.builder().expiration(5, TimeUnit.MINUTES).build();
+
     private final TemporaryCodesRepository temporaryCodesRepository;
 
     private final UserRepository userRepository;
@@ -50,6 +54,10 @@ public class MainServiceImpl implements MainService {
     private final JwtUtils jwtTokenUtils;
 
     private final MyUserDetailsService userDetailsService;
+
+    @Autowired
+    private MailService mailService;
+
 
     @Value("${js.module.smsOffice.api_key}")
     private String SMS_OFFICE_API_KEY;
@@ -252,6 +260,9 @@ public class MainServiceImpl implements MainService {
         if (userId !=null && userId !=0)
             return new ResponseEntity<>("user_already_defined", headers, HttpStatus.OK);
 
+        if (userRepository.findUserIdByEmail(model.getEmail()) !=null)
+            return new ResponseEntity<>("email_already_in_use", headers, HttpStatus.OK);
+
         if (!Objects.equals(encrypt(SALT, model.getCode()), forRegisterUserInfo.get(username)))
             return new ResponseEntity<>("temporary_code_incorrect", headers, HttpStatus.BAD_REQUEST);
 
@@ -260,4 +271,119 @@ public class MainServiceImpl implements MainService {
         forRegisterUserInfo.remove(username);
         return new ResponseEntity<>("success", headers, HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<?> getTempCodeForResetPasswordByPhone(String countryCode, String phoneNumber) {
+
+
+        if (StringUtils.isEmpty(countryCode) || StringUtils.isEmpty(phoneNumber))
+            return new ResponseEntity<>(true, headers, HttpStatus.BAD_REQUEST);
+
+        var fullUsrName = countryCode + phoneNumber;
+
+        var userId = userRepository.findUserIdByUsername(fullUsrName);
+
+        if (userId == null)
+            return new ResponseEntity<>(true, headers, HttpStatus.BAD_REQUEST);
+
+//        String code = RandomStringUtils.random(6, false, true);
+        String code = "123";
+
+//        if (smsOffice(fullUsrName, code)) {
+            resetPasswordsTempCodes.remove(userId);
+            resetPasswordsTempCodes.put(userId, encrypt(SALT, code));
+//        }
+
+
+        return new ResponseEntity<>(true, headers, HttpStatus.OK);
+
+    }
+
+    @Override
+    public ResponseEntity<?> getTempCodeForResetPasswordByEmail(String email) {
+
+
+        if (StringUtils.isEmpty(email))
+            return new ResponseEntity<>(false, headers, HttpStatus.BAD_REQUEST);
+
+
+//        String code = RandomStringUtils.random(6, false, true);
+        String code = "123";
+
+        //TODO : გასაკეთებელია
+//        try {
+//            mailService.sendMail(email, "lazarekvirtia@gmail.com", "Reset Password", "temp code: " + code);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(false, headers, HttpStatus.BAD_REQUEST);
+//        }
+
+        var userId = userRepository.findUserIdByEmail(email);
+        if (userId == null)
+            return new ResponseEntity<>(true, headers, HttpStatus.BAD_REQUEST);
+
+        resetPasswordsTempCodes.remove(userId);
+        resetPasswordsTempCodes.put(userId, encrypt(SALT, code));
+
+        return new ResponseEntity<>(true, headers, HttpStatus.OK);
+    }
+
+
+    private boolean resetPassword(Long userId, String tempPassword, String newPassword) {
+
+        if (resetPasswordsTempCodes.get(userId) == null)
+            return true;
+
+
+        if (!Objects.equals(encrypt(SALT, tempPassword), resetPasswordsTempCodes.get(userId)))
+            return true;
+
+        userDetailsService.resetPassword(userId, newPassword, SALT);
+
+        resetPasswordsTempCodes.remove(userId);
+
+        return false;
+    }
+
+    @Override
+    public ResponseEntity<?> resetPasswordByPhone(String countryPhoneCode, String phoneNumber, String newPassword, String tempPassword) {
+
+        if (StringUtils.isEmpty(tempPassword))
+            return new ResponseEntity<>("temporary_code_empty", headers, HttpStatus.BAD_REQUEST);
+
+        var username = countryPhoneCode + phoneNumber;
+        if (StringUtils.isEmpty(username))
+            return new ResponseEntity<>("phone_number_empty", headers, HttpStatus.BAD_REQUEST);
+
+        var userId = userRepository.findUserIdByUsername(username);
+        if (userId == null)
+            return new ResponseEntity<>(true, headers, HttpStatus.BAD_REQUEST);
+
+        if (resetPassword(userId, tempPassword, newPassword))
+            return new ResponseEntity<>(true, headers, HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity<>("success", headers, HttpStatus.OK);
+
+    }
+
+    @Override
+    public ResponseEntity<?> resetPasswordByEmail(String email, String newPassword, String tempPassword) {
+
+        if (StringUtils.isEmpty(tempPassword))
+            return new ResponseEntity<>("temporary_code_empty", headers, HttpStatus.BAD_REQUEST);
+
+        if (StringUtils.isEmpty(email))
+            return new ResponseEntity<>("email_empty", headers, HttpStatus.BAD_REQUEST);
+
+        var userId = userRepository.findUserIdByEmail(email);
+        if (userId == null)
+            return new ResponseEntity<>(true, headers, HttpStatus.BAD_REQUEST);
+
+        if (resetPassword(userId, tempPassword, newPassword))
+            return new ResponseEntity<>(true, headers, HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity<>("success", headers, HttpStatus.OK);
+
+    }
+
+
 }

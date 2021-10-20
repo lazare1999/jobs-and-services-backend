@@ -70,6 +70,10 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 				.cors().and()
 				.authorizeRequests()
 				.antMatchers("/authenticate",
+						"/get_temp_code_for_reset_password_by_phone",
+						"/get_temp_code_for_reset_password_by_email",
+						"/reset_password_by_phone",
+						"/reset_password_by_email",
 						"/jwt_via_refresh_token",
 						"/generate_temp_code_for_login",
 						"/generate_temp_code_for_register",

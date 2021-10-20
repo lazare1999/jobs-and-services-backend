@@ -56,4 +56,28 @@ public class MainController {
 	public ResponseEntity<String> register(RegisterModel model) {
 		return mainService.register(model);
 	}
+
+	@RequestMapping(value = "/get_temp_code_for_reset_password_by_phone", method = RequestMethod.POST)
+	public ResponseEntity<?> getTempCodeForResetPasswordByPhone(String countryCode, String phoneNumber) {
+		return mainService.getTempCodeForResetPasswordByPhone(countryCode, phoneNumber);
+	}
+
+	@RequestMapping(value = "/get_temp_code_for_reset_password_by_email", method = RequestMethod.POST)
+	public ResponseEntity<?> getTempCodeForResetPasswordByEmail(String email) {
+		return mainService.getTempCodeForResetPasswordByEmail(email);
+	}
+
+	@RequestMapping(value = "/reset_password_by_phone", method = RequestMethod.POST)
+	public ResponseEntity<?> resetPasswordByPhone(String countryPhoneCode, String phoneNumber, String newPassword, String tempPassword) {
+		return mainService.resetPasswordByPhone(countryPhoneCode, phoneNumber, newPassword, tempPassword);
+	}
+
+	@RequestMapping(value = "/reset_password_by_email", method = RequestMethod.POST)
+	public ResponseEntity<?> resetPasswordByEmail(String email, String newPassword, String tempPassword) {
+		return mainService.resetPasswordByEmail(email, newPassword, tempPassword);
+	}
+
 }
+
+
+//TODO : ინდექსები დაადე ბაზას

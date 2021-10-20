@@ -57,6 +57,11 @@ public class MyUserDetailsService implements UserDetailsService {
         getJdbcTemplate().update(sql, m.getFullPhone(), m.getFirstName(), m.getLastName(), m.getEmail(), m.getNickname(), encrypt(SALT, m.getPassword()), m.getPersonalNumber(), m.getPassportNumber(), m.getAddress());
     }
 
+    public void resetPassword(Long userId, String newPassword, String SALT) {
+        String sql = "UPDATE users.users SET password=? WHERE user_id=?";
+        getJdbcTemplate().update(sql, encrypt(SALT, newPassword), userId);
+    }
+
     private List<GrantedAuthority> loadUserAuthorities(String username) {
         return getJdbcTemplate().query(authoritiesByUsernameQuery, (rs, rowNum) -> {
             String roleName = "" + rs.getString(2);

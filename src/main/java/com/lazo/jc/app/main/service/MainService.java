@@ -25,4 +25,12 @@ public interface MainService {
     ResponseEntity<?> jwtViaRefreshToken(String refreshToken);
 
     ResponseEntity<String> register(RegisterModel model);
+
+    ResponseEntity<?> getTempCodeForResetPasswordByPhone(String countryCode, String phoneNumber);
+
+    ResponseEntity<?> getTempCodeForResetPasswordByEmail(String email);
+
+    ResponseEntity<?> resetPasswordByPhone(String countryPhoneCode, String phoneNumber, String newPassword, String tempPassword);
+
+    ResponseEntity<?> resetPasswordByEmail(String email, String newPassword, String tempPassword);
 }
