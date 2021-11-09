@@ -9,7 +9,6 @@ import java.util.Collection;
 
 /**
  * Created by Lazo on 2021-10-04
- * Created for <strong>Ministry of Internal Affairs</strong>
  */
 
 @Getter

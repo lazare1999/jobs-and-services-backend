@@ -5,12 +5,8 @@ import lombok.Getter;
 import java.io.Serializable;
 
 @Getter
-public class AuthenticationResponse implements Serializable {
-
-    private final String jwt;
-    private final Long expiresIn;
-    private final String refreshToken;
-    private final Long refreshExpiresIn;
+public record AuthenticationResponse(String jwt, Long expiresIn, String refreshToken,
+                                     Long refreshExpiresIn) implements Serializable {
 
     public AuthenticationResponse(String jwt, Long expiresIn, String refreshToken, Long refreshExpiresIn) {
         this.jwt = jwt;

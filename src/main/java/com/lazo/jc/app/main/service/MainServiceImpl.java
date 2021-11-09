@@ -55,8 +55,7 @@ public class MainServiceImpl implements MainService {
 
     private final MyUserDetailsService userDetailsService;
 
-    @Autowired
-    private MailService mailService;
+    private final MailService mailService;
 
 
     @Value("${js.module.smsOffice.api_key}")
@@ -311,11 +310,11 @@ public class MainServiceImpl implements MainService {
         String code = "123";
 
         //TODO : გასაკეთებელია
-//        try {
-//            mailService.sendMail(email, "lazarekvirtia@gmail.com", "Reset Password", "temp code: " + code);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(false, headers, HttpStatus.BAD_REQUEST);
-//        }
+        try {
+            mailService.sendMail(email, "lazarekvirtia@gmail.com", "Reset Password", "temp code: " + code);
+        } catch (Exception e) {
+            return new ResponseEntity<>(false, headers, HttpStatus.BAD_REQUEST);
+        }
 
         var userId = userRepository.findUserIdByEmail(email);
         if (userId == null)
