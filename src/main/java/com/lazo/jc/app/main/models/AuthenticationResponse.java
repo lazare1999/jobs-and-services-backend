@@ -1,10 +1,7 @@
 package com.lazo.jc.app.main.models;
 
-import lombok.Getter;
-
 import java.io.Serializable;
 
-@Getter
 public record AuthenticationResponse(String jwt, Long expiresIn, String refreshToken,
                                      Long refreshExpiresIn) implements Serializable {
 

@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.5'
+    id 'org.springframework.boot' version '2.5.6'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'war'
@@ -7,8 +7,8 @@ plugins {
 
 group = 'com.lazo.JC'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
-targetCompatibility = '17'
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 configurations {
     compileOnly {
@@ -22,11 +22,11 @@ repositories {
 
 
 dependencies {
-    compileOnly 'org.projectlombok:lombok:1.18.20'
-    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
 
-    testCompileOnly 'org.projectlombok:lombok:1.18.20'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+    testCompileOnly 'org.projectlombok:lombok:1.18.22'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 
     implementation (
             'javax.activation:activation:1.+',
@@ -43,10 +43,10 @@ dependencies {
             'javax.persistence:javax.persistence-api:2.2',
             'org.apache.commons:commons-lang3:3.12.0',
             'org.springframework.security.oauth:spring-security-oauth2:2.5.1.RELEASE',
-            'com.google.guava:guava:30.1.1-jre',
-            'net.jodah:expiringmap:0.5.9',
-            'org.jetbrains:annotations:15.0',
-            'org.springframework.boot:spring-boot-starter-mail:1.2.0.RELEASE'
+            'com.google.guava:guava:31.0.1-jre',
+            'net.jodah:expiringmap:0.5.10',
+            'org.jetbrains:annotations:22.0.0',
+            'org.springframework.boot:spring-boot-starter-mail:2.5.6'
     )
 
 

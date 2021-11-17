@@ -14,11 +14,11 @@ public class MainController {
 
 	private final MainService mainService;
 
-//	@PreAuthorize("hasRole('ROLE_JC_APP')")
-//	@RequestMapping({ "/add_role" })
-//	public ResponseEntity<Boolean> addRole(@RequestHeader("Authorization") String token, Integer roleId) {
-//		return mainService.addRole(token, roleId);
-//	}
+	@PreAuthorize("hasRole('ROLE_JC_ADMIN')")
+	@RequestMapping({ "/add_role" })
+	public ResponseEntity<Boolean> addRole(@RequestHeader("Authorization") String token, Integer roleId) {
+		return mainService.addRole(token, roleId);
+	}
 
 	@PreAuthorize("hasRole('ROLE_JC_APP')")
 	@RequestMapping({ "/get_user_name" })
@@ -78,6 +78,3 @@ public class MainController {
 	}
 
 }
-
-
-//TODO : ინდექსები დაადე ბაზას
