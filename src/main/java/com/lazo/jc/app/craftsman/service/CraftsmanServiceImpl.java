@@ -10,8 +10,8 @@ import com.lazo.jc.app.user.repository.UsersFavoriteUsersRepository;
 import com.lazo.jc.app.user.repository.UsersPaidUsersRepository;
 import com.lazo.jc.utils.JwtUtils;
 import com.lazo.jc.utils.LazoUtils;
-import org.apache.commons.lang3.StringUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,12 +19,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import static com.lazo.jc.utils.LazoUtils.getCurrentApplicationUserId;
 
 import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.lazo.jc.utils.LazoUtils.getCurrentApplicationUserId;
 
 
 /**
