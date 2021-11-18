@@ -72,4 +72,34 @@ public class CraftsmanController {
         return craftsmanService.getUserByUserId(token, otherUserId);
     }
 
+    @PreAuthorize("hasRole('ROLE_JC_CRAFTSMAN')")
+    @RequestMapping({ "/make_visible" })
+    public ResponseEntity<Boolean> makeVisible() {
+        return craftsmanService.makeVisible();
+    }
+
+    @PreAuthorize("hasRole('ROLE_JC_CRAFTSMAN')")
+    @RequestMapping({ "/unmake_visible" })
+    public ResponseEntity<Boolean> unMakeVisible() {
+        return craftsmanService.unMakeVisible();
+    }
+
+    @PreAuthorize("hasRole('ROLE_JC_CRAFTSMAN')")
+    @RequestMapping({ "/get_visibility_status" })
+    public ResponseEntity<Boolean> getVisibilityStatus() {
+        return craftsmanService.getVisibilityStatus();
+    }
+
+    @PreAuthorize("hasRole('ROLE_JC_CRAFTSMAN')")
+    @RequestMapping({ "/get_paid_users_tariff" })
+    public ResponseEntity<Double> getPaidUsersTariff(String checkedUsers) {
+        return craftsmanService.getPaidUsersTariff(checkedUsers);
+    }
+
+    @PreAuthorize("hasRole('ROLE_JC_CRAFTSMAN')")
+    @RequestMapping({ "/pay_for_users_contact_info" })
+    public ResponseEntity<Boolean> payForUsersContactInfo(String checkedUsers) {
+        return craftsmanService.payForUsersContactInfo(checkedUsers);
+    }
+
 }

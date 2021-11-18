@@ -20,18 +20,22 @@ public class AllUserModel {
     private String lastName;
     private Double rating;
     private String mainNickname;
+    private String email;
     private String nickname;
     private Boolean isFav;
+    private Boolean isPaid;
 
-    public AllUserModel(AppUser u, String nickname, Boolean isFav) {
+    public AllUserModel(AppUser u, String nickname, Boolean isFav , Boolean isPaid) {
         this.userId = u.getUserId();
         this.username = u.getUsername();
         this.firstName = u.getFirstName();
         this.lastName = u.getLastName();
         this.rating = u.getRating();
         this.mainNickname = u.getNickname();
+        this.email = u.getEmail();
         this.nickname = nickname;
         this.isFav = isFav;
+        this.isPaid = isPaid;
     }
 
 }

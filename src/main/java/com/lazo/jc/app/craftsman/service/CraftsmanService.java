@@ -28,4 +28,14 @@ public interface CraftsmanService {
     ResponseEntity<Boolean> updateNickname(String token, Long favUserId, String nickname);
 
     ResponseEntity<AllUserModel> getUserByUserId(String token, Long otherUserId);
+
+    ResponseEntity<Boolean> makeVisible();
+
+    ResponseEntity<Boolean> unMakeVisible();
+
+    ResponseEntity<Boolean> getVisibilityStatus();
+
+    ResponseEntity<Double> getPaidUsersTariff(String checkedUsers);
+
+    ResponseEntity<Boolean> payForUsersContactInfo(String checkedUsers);
 }

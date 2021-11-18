@@ -55,4 +55,7 @@ public class AppUser {
     @Column(name = "address")
     private String address;
 
+    @Column(name = "visible_for_search", insertable = false)
+    private Boolean visibleForSearch;
+
 }

@@ -20,4 +20,7 @@ public interface UserRepository extends JpaRepository<AppUser, Long>, JpaSpecifi
     @Query("select u.userId from AppUser u where u.email = :email")
     Long findUserIdByEmail(@Param("email") String email);
 
+    @Query("select u.visibleForSearch from AppUser u where u.userId = :userId")
+    Boolean getUserVisibility(@Param("userId") Long userId);
+
 }

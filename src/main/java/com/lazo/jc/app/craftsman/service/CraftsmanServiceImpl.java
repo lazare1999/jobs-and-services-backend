@@ -4,8 +4,10 @@ import com.lazo.jc.app.craftsman.models.AllUserModel;
 import com.lazo.jc.app.craftsman.models.ProfileModel;
 import com.lazo.jc.app.user.domains.AppUser;
 import com.lazo.jc.app.user.domains.UsersFavoriteUsersDomain;
+import com.lazo.jc.app.user.domains.UsersPaidUsersDomain;
 import com.lazo.jc.app.user.repository.UserRepository;
 import com.lazo.jc.app.user.repository.UsersFavoriteUsersRepository;
+import com.lazo.jc.app.user.repository.UsersPaidUsersRepository;
 import com.lazo.jc.utils.JwtUtils;
 import com.lazo.jc.utils.LazoUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.lazo.jc.utils.LazoUtils.getCurrentApplicationUserId;
 
 import javax.persistence.criteria.Predicate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +41,11 @@ public class CraftsmanServiceImpl implements CraftsmanService {
 
     private final UsersFavoriteUsersRepository usersFavoriteUsersRepository;
 
+    private final UsersPaidUsersRepository usersPaidUsersRepository;
+
     private final JwtUtils jwtTokenUtils;
+
+    private static final long PAYED_IS_ACTIVE_FOR_DAYS = 30;
 
     @Override
     public ResponseEntity<AppUser> getProfileData(String token) {
@@ -110,6 +117,13 @@ public class CraftsmanServiceImpl implements CraftsmanService {
             favUsersIds.add(f.getFavoriteUserId());
         }
 
+        var paidUsers = usersPaidUsersRepository.findAllByUserId(userId.longValue());
+        var paidUsersIds = new ArrayList<>();
+        paidUsersIds.add(-1L);
+        for (var p : paidUsers) {
+            paidUsersIds.add(p.getPaidUserId());
+        }
+
         var users =  userRepository.findAll((root, query, builder) -> {
             Predicate predicate = builder.conjunction();
 
@@ -118,6 +132,8 @@ public class CraftsmanServiceImpl implements CraftsmanService {
             } else {
                 predicate = builder.and(predicate, builder.not(builder.in(root.get("userId")).value(favUsersIds)));
             }
+
+            predicate = builder.and(predicate, builder.equal(root.get("visibleForSearch"), true));
 
             return predicate;
         }, PageRequest.of(pageKey, pageSize, LazoUtils.getSortDesc("rating")));
@@ -129,8 +145,7 @@ public class CraftsmanServiceImpl implements CraftsmanService {
                 isF = true;
                 nName = usersFavoriteUsersRepository.nickname(userId.longValue(), u.getUserId());
             }
-
-            var m = new AllUserModel(u, nName, isF);
+            var m = new AllUserModel(u, nName, isF, paidUsersIds.contains(u.getUserId()));
             ans.add(m);
         }
 
@@ -230,6 +245,114 @@ public class CraftsmanServiceImpl implements CraftsmanService {
 
 
         return new ResponseEntity<>(ans, headers, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Boolean> makeVisible() {
+        var user0 = userRepository.findById(Long.valueOf(getCurrentApplicationUserId()));
+
+        if (user0.isEmpty())
+            return new ResponseEntity<>(false, headers, HttpStatus.BAD_REQUEST);
+
+        var user = user0.get();
+        user.setVisibleForSearch(true);
+        userRepository.save(user);
+        return new ResponseEntity<>(true, headers, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Boolean> unMakeVisible() {
+        var user0 = userRepository.findById(Long.valueOf(getCurrentApplicationUserId()));
+
+        if (user0.isEmpty())
+            return new ResponseEntity<>(false, headers, HttpStatus.BAD_REQUEST);
+
+        var user = user0.get();
+        user.setVisibleForSearch(false);
+        userRepository.save(user);
+        return new ResponseEntity<>(true, headers, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Boolean> getVisibilityStatus() {
+        var userVisibility = userRepository.getUserVisibility(Long.valueOf(getCurrentApplicationUserId()));
+
+        if (userVisibility ==null)
+            return new ResponseEntity<>(false, headers, HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity<>(userVisibility, headers, HttpStatus.OK);
+    }
+
+    private List<Long> getLngList(String checkedUsers) {
+        var listString = checkedUsers.replace("[","").replace("]","");
+
+        if (StringUtils.isEmpty(listString))
+            return new ArrayList<>();
+
+        String[] strList = listString.split(",");
+        List<Long> lngList = new ArrayList<>();
+        for(String s : strList) lngList.add(Long.valueOf(s.trim()));
+        return lngList;
+    }
+
+    //        TODO : დაადგინე ტარიფი
+    private long calculatePaidUsersTariff(String checkedUsers) {
+        try {
+            long usersCount = 0;
+            var lngList = getLngList(checkedUsers);
+
+            if (StringUtils.isNotEmpty(checkedUsers) && !lngList.isEmpty()) {
+                usersCount = userRepository.count((root, query, builder) -> {
+                    Predicate predicate = builder.conjunction();
+                    predicate = builder.and(predicate, builder.in(root.get("userId")).value(lngList));
+                    return predicate;
+                });
+            }
+
+            return usersCount;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    @Override
+    public ResponseEntity<Double> getPaidUsersTariff(String checkedUsers) {
+
+        return new ResponseEntity<>(calculatePaidUsersTariff(checkedUsers) * 1.0, headers, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Boolean> payForUsersContactInfo(String checkedUsers) {
+//        TODO : გასსაკეთებელია ბუღალტერია
+//        var tariff = calculatePaidUsersTariff(checkedUsers);
+
+        if (StringUtils.isEmpty(checkedUsers))
+            return new ResponseEntity<>(false, headers, HttpStatus.OK);
+
+        var lngList = getLngList(checkedUsers);
+
+        if (lngList.isEmpty())
+            return new ResponseEntity<>(false, headers, HttpStatus.OK);
+
+        var users = userRepository.findAll((root, query, builder) -> {
+            Predicate predicate = builder.conjunction();
+            predicate = builder.and(predicate, builder.in(root.get("userId")).value(lngList));
+            return predicate;
+        });
+
+        if (users.isEmpty())
+            return new ResponseEntity<>(false, headers, HttpStatus.OK);
+
+
+        for (var u : users) {
+            var newPaidUser = new UsersPaidUsersDomain();
+            newPaidUser.setUserId(Long.valueOf(getCurrentApplicationUserId()));
+            newPaidUser.setPaidUserId(u.getUserId());
+            newPaidUser.setPaidUntil(LocalDateTime.now().plusDays(PAYED_IS_ACTIVE_FOR_DAYS));
+            usersPaidUsersRepository.save(newPaidUser);
+        }
+
+        return new ResponseEntity<>(true, headers, HttpStatus.OK);
     }
 
 }
