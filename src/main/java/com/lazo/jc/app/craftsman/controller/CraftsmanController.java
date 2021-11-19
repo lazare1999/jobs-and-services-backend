@@ -4,7 +4,7 @@ import com.lazo.jc.app.craftsman.models.AllUserModel;
 import com.lazo.jc.app.craftsman.models.ProfileModel;
 import com.lazo.jc.app.craftsman.models.checkIfPaidExpiredModel;
 import com.lazo.jc.app.craftsman.service.CraftsmanService;
-import com.lazo.jc.app.user.domains.AppUser;
+import com.lazo.jc.app.user.domains.AppUserDomain;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,7 +27,7 @@ public class CraftsmanController {
 
     @PreAuthorize("hasRole('ROLE_JC_CRAFTSMAN')")
 	@RequestMapping({ "/get_profile_data" })
-	public ResponseEntity<AppUser> getProfileData(@RequestHeader("Authorization") String token) {
+	public ResponseEntity<AppUserDomain> getProfileData(@RequestHeader("Authorization") String token) {
         return craftsmanService.getProfileData(token);
 	}
 
@@ -113,6 +113,18 @@ public class CraftsmanController {
     @RequestMapping({ "/check_if_paid_expired" })
     public ResponseEntity<checkIfPaidExpiredModel> checkIfPaidExpired(Long paidUserId) {
         return craftsmanService.checkIfPaidExpired(paidUserId);
+    }
+
+    @PreAuthorize("hasRole('ROLE_JC_CRAFTSMAN')")
+    @RequestMapping({ "/get_craftsman_phone_by_user_id" })
+    public ResponseEntity<String> getCraftsmanPhoneByUserId(Long paidUserId) {
+        return craftsmanService.getCraftsmanPhoneByUserId(paidUserId);
+    }
+
+    @PreAuthorize("hasRole('ROLE_JC_CRAFTSMAN')")
+    @RequestMapping({ "/get_craftsman_email_by_user_id" })
+    public ResponseEntity<String> getCraftsmanEmailByUserId(Long paidUserId) {
+        return craftsmanService.getCraftsmanEmailByUserId(paidUserId);
     }
 
 }

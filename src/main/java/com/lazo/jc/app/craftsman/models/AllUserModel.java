@@ -1,6 +1,6 @@
 package com.lazo.jc.app.craftsman.models;
 
-import com.lazo.jc.app.user.domains.AppUser;
+import com.lazo.jc.app.user.domains.AppUserDomain;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -25,7 +25,7 @@ public class AllUserModel {
     private Boolean isFav;
     private Boolean isPaid;
 
-    public AllUserModel(AppUser u, String nickname, Boolean isFav , Boolean isPaid) {
+    public AllUserModel(AppUserDomain u, String nickname, Boolean isFav , Boolean isPaid) {
         this.userId = u.getUserId();
         this.username = u.getUsername();
         this.firstName = u.getFirstName();

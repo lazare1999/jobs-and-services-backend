@@ -19,7 +19,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @Entity
 @Table(schema = "users", name = "active_users")
-public class AppUser {
+public class AppUserDomain {
 
     @Id
     @Column(name = "user_id")

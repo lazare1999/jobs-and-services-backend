@@ -3,9 +3,11 @@ package com.lazo.jc.app.craftsman.service;
 import com.lazo.jc.app.craftsman.models.AllUserModel;
 import com.lazo.jc.app.craftsman.models.ProfileModel;
 import com.lazo.jc.app.craftsman.models.checkIfPaidExpiredModel;
-import com.lazo.jc.app.user.domains.AppUser;
+import com.lazo.jc.app.user.domains.AppUserDomain;
+import com.lazo.jc.app.user.domains.AppUserMinimalDomain;
 import com.lazo.jc.app.user.domains.UsersFavoriteUsersDomain;
 import com.lazo.jc.app.user.domains.UsersPaidUsersDomain;
+import com.lazo.jc.app.user.repository.AppUserMinimalRepository;
 import com.lazo.jc.app.user.repository.UserRepository;
 import com.lazo.jc.app.user.repository.UsersFavoriteUsersRepository;
 import com.lazo.jc.app.user.repository.UsersPaidUsersRepository;
@@ -43,6 +45,8 @@ public class CraftsmanServiceImpl implements CraftsmanService {
 
     private final UserRepository userRepository;
 
+    private final AppUserMinimalRepository appUserMinimalRepository;
+
     private final UsersFavoriteUsersRepository usersFavoriteUsersRepository;
 
     private final UsersPaidUsersRepository usersPaidUsersRepository;
@@ -52,19 +56,19 @@ public class CraftsmanServiceImpl implements CraftsmanService {
     private static final long PAYED_IS_ACTIVE_FOR_DAYS = 2;
 
     @Override
-    public ResponseEntity<AppUser> getProfileData(String token) {
+    public ResponseEntity<AppUserDomain> getProfileData(String token) {
         var userName = jwtTokenUtils.getUserNameViaToken(token);
 
         if (StringUtils.isEmpty(userName))
-            return new ResponseEntity<>(new AppUser(), headers, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AppUserDomain(), headers, HttpStatus.BAD_REQUEST);
 
         var username = jwtTokenUtils.extractUsername(token.substring(7));
 
         if (StringUtils.isEmpty(username))
-            return new ResponseEntity<>(new AppUser(), headers, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AppUserDomain(), headers, HttpStatus.BAD_REQUEST);
 
 
-        AppUser user = userRepository.findByUsername(username);
+        AppUserDomain user = userRepository.findByUsername(username);
 
         return new ResponseEntity<>(user, headers, HttpStatus.OK);
 
@@ -400,6 +404,55 @@ public class CraftsmanServiceImpl implements CraftsmanService {
 
 
         return new ResponseEntity<>(ans, headers, HttpStatus.OK);
+    }
+
+    private AppUserMinimalDomain getPaidUserContactInfo(Long paidUserId) {
+        var ans = new AppUserMinimalDomain();
+
+        if (paidUserId ==null)
+            return ans;
+
+        var paidUser0 = usersPaidUsersRepository.findAllByUserIdAndPaidUserId(Long.valueOf(getCurrentApplicationUserId()), paidUserId);
+
+        if (paidUser0.isEmpty())
+            return ans;
+
+        var user0 = appUserMinimalRepository.findById(paidUserId);
+
+        if (user0.isEmpty())
+            return ans;
+
+        var user = user0.get();
+
+        ans.setEmail(user.getEmail());
+        ans.setPhoneNumber(user.getPhoneNumber());
+        return ans;
+    }
+
+    @Override
+    public ResponseEntity<String> getCraftsmanPhoneByUserId(Long paidUserId) {
+
+        var user = getPaidUserContactInfo(paidUserId);
+
+        if (StringUtils.isEmpty(user.getPhoneNumber()))
+            return new ResponseEntity<>("", headers, HttpStatus.BAD_REQUEST);
+
+
+        return new ResponseEntity<>(user.getPhoneNumber(), headers, HttpStatus.OK);
+
+    }
+
+    @Override
+    public ResponseEntity<String> getCraftsmanEmailByUserId(Long paidUserId) {
+
+        var user = getPaidUserContactInfo(paidUserId);
+
+        if (StringUtils.isEmpty(user.getEmail()))
+            return new ResponseEntity<>("", headers, HttpStatus.BAD_REQUEST);
+
+
+        return new ResponseEntity<>(user.getEmail(), headers, HttpStatus.OK);
+
     }
 
 }

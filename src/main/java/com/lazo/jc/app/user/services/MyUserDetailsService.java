@@ -1,7 +1,7 @@
 package com.lazo.jc.app.user.services;
 
 import com.lazo.jc.app.main.models.RegisterModel;
-import com.lazo.jc.app.user.domains.AppUser;
+import com.lazo.jc.app.user.domains.AppUserDomain;
 import com.lazo.jc.app.user.repository.UserRepository;
 import com.lazo.jc.security.ApplicationUser;
 import lombok.Getter;
@@ -96,7 +96,7 @@ public class MyUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        AppUser user = userRepository.findByUsername(username);
+        AppUserDomain user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException(username);
         }

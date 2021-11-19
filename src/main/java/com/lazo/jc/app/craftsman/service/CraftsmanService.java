@@ -3,7 +3,7 @@ package com.lazo.jc.app.craftsman.service;
 import com.lazo.jc.app.craftsman.models.AllUserModel;
 import com.lazo.jc.app.craftsman.models.ProfileModel;
 import com.lazo.jc.app.craftsman.models.checkIfPaidExpiredModel;
-import com.lazo.jc.app.user.domains.AppUser;
+import com.lazo.jc.app.user.domains.AppUserDomain;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface CraftsmanService {
 
-    ResponseEntity<AppUser> getProfileData(String token);
+    ResponseEntity<AppUserDomain> getProfileData(String token);
 
     ResponseEntity<String> getRating(String token);
 
@@ -43,4 +43,8 @@ public interface CraftsmanService {
     ResponseEntity<Boolean> removeFromPaidUsers(Long paidUserId);
 
     ResponseEntity<checkIfPaidExpiredModel> checkIfPaidExpired(Long paidUserId);
+
+    ResponseEntity<String> getCraftsmanPhoneByUserId(Long paidUserId);
+
+    ResponseEntity<String> getCraftsmanEmailByUserId(Long paidUserId);
 }
