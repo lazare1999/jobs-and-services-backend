@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 /**
  * Created by Lazo on 2021-11-18
- * Created for <strong>Ministry of Internal Affairs</strong>
  */
 
 @Setter

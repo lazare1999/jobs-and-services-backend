@@ -12,12 +12,12 @@ import java.util.Optional;
 
 /**
  * Created by Lazo on 2021-11-18
- * Created for <strong>Ministry of Internal Affairs</strong>
  */
 
 public interface UsersPaidUsersRepository extends JpaRepository<UsersPaidUsersDomain, Long>, JpaSpecificationExecutor<UsersPaidUsersDomain> {
 
     List<UsersPaidUsersDomain> findAllByUserId(Long userId);
+    Optional<UsersPaidUsersDomain> findAllByUserIdAndPaidUserId(Long userId, Long paidUserId);
 
     @Modifying
     @Query("delete from UsersPaidUsersDomain p where p.userId = :userId and p.paidUserId = :paidUserId")

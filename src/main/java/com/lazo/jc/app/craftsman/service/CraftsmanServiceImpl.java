@@ -2,6 +2,7 @@ package com.lazo.jc.app.craftsman.service;
 
 import com.lazo.jc.app.craftsman.models.AllUserModel;
 import com.lazo.jc.app.craftsman.models.ProfileModel;
+import com.lazo.jc.app.craftsman.models.checkIfPaidExpiredModel;
 import com.lazo.jc.app.user.domains.AppUser;
 import com.lazo.jc.app.user.domains.UsersFavoriteUsersDomain;
 import com.lazo.jc.app.user.domains.UsersPaidUsersDomain;
@@ -22,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +49,7 @@ public class CraftsmanServiceImpl implements CraftsmanService {
 
     private final JwtUtils jwtTokenUtils;
 
-    private static final long PAYED_IS_ACTIVE_FOR_DAYS = 30;
+    private static final long PAYED_IS_ACTIVE_FOR_DAYS = 2;
 
     @Override
     public ResponseEntity<AppUser> getProfileData(String token) {
@@ -354,6 +357,49 @@ public class CraftsmanServiceImpl implements CraftsmanService {
         }
 
         return new ResponseEntity<>(true, headers, HttpStatus.OK);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<Boolean> removeFromPaidUsers(Long paidUserId) {
+
+        if (paidUserId ==null)
+            return new ResponseEntity<>(false, headers, HttpStatus.OK);
+
+        usersPaidUsersRepository.deleteByUserIdAndPaidUserId(Long.valueOf(getCurrentApplicationUserId()), paidUserId);
+
+        return new ResponseEntity<>(true, headers, HttpStatus.OK);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<checkIfPaidExpiredModel> checkIfPaidExpired(Long paidUserId) {
+
+        var ans = new checkIfPaidExpiredModel();
+        ans.setIsNotPaid(true);
+
+        if (paidUserId ==null)
+            return new ResponseEntity<>(ans, headers, HttpStatus.BAD_REQUEST);
+
+        var paidUser0 = usersPaidUsersRepository.findAllByUserIdAndPaidUserId(Long.valueOf(getCurrentApplicationUserId()), paidUserId);
+
+        if (paidUser0.isEmpty())
+            return new ResponseEntity<>(ans, headers, HttpStatus.OK);
+
+        var paidUser = paidUser0.get();
+        if (paidUser.getPaidUntil() ==null) {
+            usersPaidUsersRepository.deleteByUserIdAndPaidUserId(Long.valueOf(getCurrentApplicationUserId()), paidUserId);
+            return new ResponseEntity<>(ans, headers, HttpStatus.OK);
+        }
+
+        if (LocalDateTime.now().isBefore(paidUser.getPaidUntil())) {
+            ZonedDateTime zdt = ZonedDateTime.of(paidUser.getPaidUntil(), ZoneId.systemDefault());
+            ans.setIsNotPaid(false);
+            ans.setExpiresIn(zdt.toInstant().toEpochMilli());
+        }
+
+
+        return new ResponseEntity<>(ans, headers, HttpStatus.OK);
     }
 
 }

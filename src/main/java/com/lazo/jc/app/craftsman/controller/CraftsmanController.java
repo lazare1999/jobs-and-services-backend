@@ -2,6 +2,7 @@ package com.lazo.jc.app.craftsman.controller;
 
 import com.lazo.jc.app.craftsman.models.AllUserModel;
 import com.lazo.jc.app.craftsman.models.ProfileModel;
+import com.lazo.jc.app.craftsman.models.checkIfPaidExpiredModel;
 import com.lazo.jc.app.craftsman.service.CraftsmanService;
 import com.lazo.jc.app.user.domains.AppUser;
 import lombok.RequiredArgsConstructor;
@@ -100,6 +101,18 @@ public class CraftsmanController {
     @RequestMapping({ "/pay_for_users_contact_info" })
     public ResponseEntity<Boolean> payForUsersContactInfo(String checkedUsers) {
         return craftsmanService.payForUsersContactInfo(checkedUsers);
+    }
+
+    @PreAuthorize("hasRole('ROLE_JC_CRAFTSMAN')")
+    @RequestMapping({ "/remove_from_paid_users" })
+    public ResponseEntity<Boolean> removeFromPaidUsers(Long paidUserId) {
+        return craftsmanService.removeFromPaidUsers(paidUserId);
+    }
+
+    @PreAuthorize("hasRole('ROLE_JC_CRAFTSMAN')")
+    @RequestMapping({ "/check_if_paid_expired" })
+    public ResponseEntity<checkIfPaidExpiredModel> checkIfPaidExpired(Long paidUserId) {
+        return craftsmanService.checkIfPaidExpired(paidUserId);
     }
 
 }

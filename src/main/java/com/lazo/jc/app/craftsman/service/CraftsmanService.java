@@ -2,6 +2,7 @@ package com.lazo.jc.app.craftsman.service;
 
 import com.lazo.jc.app.craftsman.models.AllUserModel;
 import com.lazo.jc.app.craftsman.models.ProfileModel;
+import com.lazo.jc.app.craftsman.models.checkIfPaidExpiredModel;
 import com.lazo.jc.app.user.domains.AppUser;
 import org.springframework.http.ResponseEntity;
 
@@ -38,4 +39,8 @@ public interface CraftsmanService {
     ResponseEntity<Double> getPaidUsersTariff(String checkedUsers);
 
     ResponseEntity<Boolean> payForUsersContactInfo(String checkedUsers);
+
+    ResponseEntity<Boolean> removeFromPaidUsers(Long paidUserId);
+
+    ResponseEntity<checkIfPaidExpiredModel> checkIfPaidExpired(Long paidUserId);
 }
